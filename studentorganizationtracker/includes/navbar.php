@@ -1,16 +1,18 @@
-<header class="navbar">
-    <div class="container">
-        <div class="nav-brand">
-            <h1>Student Org Tracker</h1>
-        </div>
-        <nav>
-            <a href="../students/index.php">Students</a>
-            <a href="../organizations/index.php">Organizations</a>
-            <a href="../events/index.php">Events</a>
-            <a href="../reports/students_report.php">Reports</a>
-            <span class="user-info">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> | 
-            <a href="../auth/logout.php">Logout</a></span>
-        </nav>
-    </div>
-</header>
+<aside class="sidebar">
 
+    <h2 class="logo">Admin Panel</h2>
+
+    <a href="/studentorganizationtracker/index.php">Dashboard</a>
+    <a href="/studentorganizationtracker/students/index.php">Students</a>
+    <a href="/studentorganizationtracker/organizations/index.php">Organizations</a>
+    <a href="/studentorganizationtracker/events/index.php">Events</a>
+    <a href="/studentorganizationtracker/reports/index.php">Reports</a>
+
+    <div class="sidebar-footer">
+        <p>👤 <?php echo htmlspecialchars($_SESSION['username']); ?></p>
+        <a href="/studentorganizationtracker/auth/logout.php">Logout</a>
+    </div>
+
+</aside>
+
+<div class="main-content">
