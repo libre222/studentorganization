@@ -1,8 +1,9 @@
     <footer class="footer">
-        <div class="container">
-            <p>&copy; <?php echo date('Y'); ?> Student Organization Tracker. All rights reserved.</p>
-        </div>
+        <p>&copy; <?php echo date('Y'); ?> Student Organization Tracker</p>
     </footer>
+
+</div> <!-- main-content -->
+</div> <!-- layout -->
+
 </body>
 </html>
-
