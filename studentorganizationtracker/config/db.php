@@ -1,14 +1,9 @@
 <?php
-/**
- * Database Configuration
- * Student Organization Tracker
- */
-
 function getDBConnection() {
     $host = 'localhost';
     $dbname = 'student_org_tracker';
     $username = 'root';
-    $password = '';  // Default XAMPP/MySQL password
+    $password = '';
 
     $conn = new mysqli($host, $username, $password, $dbname);
     
@@ -16,8 +11,7 @@ function getDBConnection() {
         die("Connection failed: " . $conn->connect_error);
     }
     
-    $conn->set_charset("utf8");
+    $conn->set_charset("utf8mb4");
     return $conn;
 }
 ?>
-
