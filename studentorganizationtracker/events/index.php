@@ -7,96 +7,124 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$conn = getDBConnection();
-
-// SEARCH
+$conn   = getDBConnection();
 $search = $_GET['search'] ?? '';
 
 if (!empty($search)) {
     $stmt = $conn->prepare("
-        SELECT e.*, o.org_name 
-        FROM events e
+        SELECT e.*, o.org_name FROM events e
         JOIN organizations o ON e.org_id = o.org_id
-        WHERE e.event_name LIKE ? 
-        OR e.location LIKE ?
-        OR o.org_name LIKE ?
+        WHERE e.event_name LIKE ? OR e.location LIKE ? OR o.org_name LIKE ?
         ORDER BY e.event_date DESC
     ");
-    
     $like = "%$search%";
     $stmt->bind_param("sss", $like, $like, $like);
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
     $result = $conn->query("
-        SELECT e.*, o.org_name 
-        FROM events e
+        SELECT e.*, o.org_name FROM events e
         JOIN organizations o ON e.org_id = o.org_id
         ORDER BY e.event_date DESC
     ");
 }
 
-$events = $result->fetch_all(MYSQLI_ASSOC);
+$events = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 $conn->close();
+
+// Badge colour based on event date
+function event_badge_class(string $date): string {
+    $ts  = strtotime($date);
+    $now = time();
+    if ($ts > $now) return 'badge-green';
+    if ($ts > $now - 86400 * 7) return 'badge-amber';
+    return 'badge-gray';
+}
 ?>
-
 <?php include __DIR__ . '/../includes/header.php'; ?>
-<?php include __DIR__ . '/../includes/navbar.php'; ?>
 
-<div class="container">
+<div class="page-header">
+    <div>
+        <h2>Events</h2>
+        <p>All scheduled organization events.</p>
+    </div>
+    <a href="add.php" class="btn btn-primary">+ Add Event</a>
+</div>
 
-<h2>Events</h2>
-
-<!-- SEARCH BAR -->
-<form method="GET" class="search-bar">
-    <input 
-        type="text" 
-        name="search" 
-        placeholder="Search events..." 
-        value="<?php echo htmlspecialchars($search); ?>"
-    >
-    <button type="submit" class="btn btn-primary">Search</button>
-    <a href="index.php" class="btn btn-secondary">Reset</a>
-</form>
-
-<a href="add.php" class="btn btn-primary">Add Event</a>
-
-<br><br>
-
-<table class="data-table">
-<tr>
-    <th>ID</th>
-    <th>Event Name</th>
-    <th>Organization</th>
-    <th>Date</th>
-    <th>Location</th>
-    <th>Action</th>
-</tr>
-
-<?php if (empty($events)): ?>
-<tr>
-    <td colspan="6">No events found.</td>
-</tr>
-<?php else: ?>
-
-<?php foreach ($events as $e): ?>
-<tr>
-    <td><?php echo htmlspecialchars($e['event_id']); ?></td>
-    <td><?php echo htmlspecialchars($e['event_name']); ?></td>
-    <td><?php echo htmlspecialchars($e['org_name']); ?></td>
-    <td><?php echo htmlspecialchars($e['event_date']); ?></td>
-    <td><?php echo htmlspecialchars($e['location']); ?></td>
-    <td>
-        <a href="edit.php?id=<?php echo $e['event_id']; ?>" class="btn btn-small btn-secondary">Edit</a>
-        <a href="delete.php?id=<?php echo $e['event_id']; ?>" class="btn btn-small btn-danger" onclick="return confirm('Delete this event?')">Delete</a>
-    </td>
-</tr>
-<?php endforeach; ?>
-
+<?php if (isset($_SESSION['success'])): ?>
+    <div class="alert success">✅ <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
 <?php endif; ?>
 
-</table>
+<div class="toolbar">
+    <div class="toolbar-left">
+        <form method="GET" style="display:flex; gap:8px; align-items:center;">
+            <div class="search-field">
+                <span class="search-icon-inner">🔍</span>
+                <input type="text" name="search"
+                       placeholder="Search events, org, location..."
+                       value="<?php echo htmlspecialchars($search); ?>">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Search</button>
+            <?php if ($search): ?><a href="index.php" class="btn btn-secondary btn-sm">Clear</a><?php endif; ?>
+        </form>
+    </div>
+    <div style="font-size:12.5px; color:var(--text-muted);">
+        <?php echo count($events); ?> event<?php echo count($events) !== 1 ? 's' : ''; ?>
+    </div>
+</div>
 
+<div class="card">
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Event Name</th>
+                    <th>Organization</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php if (empty($events)): ?>
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <div class="empty-icon">📅</div>
+                            <p>No events found.</p>
+                            <a href="add.php" class="btn btn-primary btn-sm">Add First Event</a>
+                        </div>
+                    </td>
+                </tr>
+            <?php else: ?>
+                <?php foreach ($events as $e): ?>
+                <tr>
+                    <td class="cell-id">#<?php echo htmlspecialchars($e['event_id']); ?></td>
+                    <td class="cell-name"><?php echo htmlspecialchars($e['event_name']); ?></td>
+                    <td><span class="badge badge-blue"><?php echo htmlspecialchars($e['org_name']); ?></span></td>
+                    <td>
+                        <span class="badge <?php echo event_badge_class($e['event_date']); ?>">
+                            📅 <?php echo htmlspecialchars($e['event_date']); ?>
+                        </span>
+                    </td>
+                    <td style="color:var(--text-secondary);">
+                        <?php echo $e['location'] ? '📍 ' . htmlspecialchars($e['location']) : '<em style="color:var(--text-muted);">—</em>'; ?>
+                    </td>
+                    <td>
+                        <div class="td-actions">
+                            <a href="edit.php?id=<?php echo $e['event_id']; ?>" class="btn btn-secondary btn-sm">✏️ Edit</a>
+                            <a href="delete.php?id=<?php echo $e['event_id']; ?>"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete this event?')">🗑️ Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
