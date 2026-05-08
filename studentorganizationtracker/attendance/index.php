@@ -37,7 +37,6 @@ if (!empty($search)) {
 
 $records = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 
-// Summary counts
 $total   = count($records);
 $present = count(array_filter($records, fn($r) => strtolower($r['status']) === 'present'));
 $absent  = count(array_filter($records, fn($r) => strtolower($r['status']) === 'absent'));
@@ -52,33 +51,35 @@ $conn->close();
         <h2>Attendance</h2>
         <p>Track student attendance across all events.</p>
     </div>
-    <a href="mark.php" class="btn btn-primary">+ Mark Attendance</a>
+    <a href="mark.php" class="btn btn-primary">
+        <span class="material-symbols-outlined"></span> Mark Attendance
+    </a>
 </div>
 
 <?php if (isset($_SESSION['success'])): ?>
-    <div class="alert success">✅ <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
+    <div class="alert success"><span class="material-symbols-outlined">check_circle</span> <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
 <?php endif; ?>
 <?php if (isset($_SESSION['error'])): ?>
-    <div class="alert error">⚠️ <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
+    <div class="alert error"><span class="material-symbols-outlined">error</span> <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
 <?php endif; ?>
 
-<!-- Summary Mini Cards -->
-<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px;">
-    <div class="card card-padded" style="text-align:center; padding:16px;">
-        <div style="font-size:22px; font-weight:800; color:var(--text-primary);"><?php echo $total; ?></div>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Total Records</div>
+<!-- Summary Cards -->
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:var(--sp-lg); margin-bottom:var(--sp-lg);">
+    <div class="stat-card">
+        <div class="stat-label">Total Records</div>
+        <div class="stat-value" style="color:var(--on-surface);"><?php echo $total; ?></div>
     </div>
-    <div class="card card-padded" style="text-align:center; padding:16px; border-top:3px solid var(--success);">
-        <div style="font-size:22px; font-weight:800; color:var(--success);"><?php echo $present; ?></div>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Present</div>
+    <div class="stat-card" style="border-top:3px solid #22c55e;">
+        <div class="stat-label">Present</div>
+        <div class="stat-value" style="color:#16a34a;"><?php echo $present; ?></div>
     </div>
-    <div class="card card-padded" style="text-align:center; padding:16px; border-top:3px solid var(--danger);">
-        <div style="font-size:22px; font-weight:800; color:var(--danger);"><?php echo $absent; ?></div>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Absent</div>
+    <div class="stat-card" style="border-top:3px solid #ef4444;">
+        <div class="stat-label">Absent</div>
+        <div class="stat-value" style="color:#dc2626;"><?php echo $absent; ?></div>
     </div>
-    <div class="card card-padded" style="text-align:center; padding:16px; border-top:3px solid var(--warning);">
-        <div style="font-size:22px; font-weight:800; color:var(--warning);"><?php echo $late; ?></div>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Late</div>
+    <div class="stat-card" style="border-top:3px solid #f59e0b;">
+        <div class="stat-label">Late</div>
+        <div class="stat-value" style="color:#d97706;"><?php echo $late; ?></div>
     </div>
 </div>
 
@@ -86,7 +87,7 @@ $conn->close();
     <div class="toolbar-left">
         <form method="GET" style="display:flex; gap:8px; align-items:center;">
             <div class="search-field">
-                <span class="search-icon-inner">🔍</span>
+                <span class="material-symbols-outlined search-icon-inner">search</span>
                 <input type="text" name="search"
                        placeholder="Search by student, event, status..."
                        value="<?php echo htmlspecialchars($search); ?>">
@@ -97,7 +98,7 @@ $conn->close();
             <?php endif; ?>
         </form>
     </div>
-    <div style="font-size:12.5px; color:var(--text-muted);">
+    <div style="font-size:13px; color:var(--secondary);">
         <?php echo $total; ?> record<?php echo $total !== 1 ? 's' : ''; ?>
     </div>
 </div>
@@ -121,7 +122,7 @@ $conn->close();
                 <tr>
                     <td colspan="7">
                         <div class="empty-state">
-                            <div class="empty-icon">✅</div>
+                            <div class="empty-icon"><span class="material-symbols-outlined">how_to_reg</span></div>
                             <p>No attendance records found<?php echo $search ? ' matching "' . htmlspecialchars($search) . '"' : ''; ?>.</p>
                             <a href="mark.php" class="btn btn-primary btn-sm">Mark Attendance</a>
                         </div>
@@ -132,24 +133,26 @@ $conn->close();
                 <?php
                 $status = strtolower($a['status'] ?? 'present');
                 $status_badge = match($status) {
-                    'present' => ['badge-green',  '✅ Present'],
-                    'absent'  => ['badge-red',    '❌ Absent'],
-                    'late'    => ['badge-amber',   '⏰ Late'],
-                    default   => ['badge-gray',    ucfirst($status)],
+                    'present' => ['badge-green', 'Present'],
+                    'absent'  => ['badge-red',   'Absent'],
+                    'late'    => ['badge-amber',  'Late'],
+                    default   => ['badge-gray',   ucfirst($status)],
                 };
                 ?>
                 <tr>
                     <td class="cell-id">#<?php echo htmlspecialchars($a['attendance_id']); ?></td>
-                    <td class="cell-name">🎒 <?php echo htmlspecialchars($a['student_name']); ?></td>
-                    <td><?php echo htmlspecialchars($a['event_name']); ?></td>
+                    <td class="cell-name"><?php echo htmlspecialchars($a['student_name']); ?></td>
+                    <td style="color:var(--secondary);"><?php echo htmlspecialchars($a['event_name']); ?></td>
                     <td><span class="badge badge-blue"><?php echo htmlspecialchars($a['org_name']); ?></span></td>
                     <td><span class="badge <?php echo $status_badge[0]; ?>"><?php echo $status_badge[1]; ?></span></td>
-                    <td style="color:var(--text-muted);"><?php echo htmlspecialchars($a['date_marked'] ?? '—'); ?></td>
+                    <td style="color:var(--secondary);"><?php echo htmlspecialchars($a['date_marked'] ?? '—'); ?></td>
                     <td>
                         <div class="td-actions">
                             <a href="delete.php?id=<?php echo $a['attendance_id']; ?>"
                                class="btn btn-danger btn-sm"
-                               onclick="return confirm('Delete this attendance record?')">🗑️ Delete</a>
+                               onclick="return confirm('Delete this attendance record?')">
+                                <span class="material-symbols-outlined"></span> Delete
+                            </a>
                         </div>
                     </td>
                 </tr>
