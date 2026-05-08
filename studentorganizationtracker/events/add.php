@@ -8,46 +8,103 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $conn = getDBConnection();
-$orgs = $conn->query("SELECT * FROM organizations");
+$orgs = $conn->query("SELECT * FROM organizations ORDER BY org_name ASC");
+$org_list = $orgs ? $orgs->fetch_all(MYSQLI_ASSOC) : [];
+
+$error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $org_id = $_POST['org_id'];
-    $name = $_POST['event_name'];
-    $date = $_POST['event_date'];
-    $location = $_POST['location'];
+    $org_id   = $_POST['org_id'];
+    $name     = trim($_POST['event_name']);
+    $date     = $_POST['event_date'];
+    $location = trim($_POST['location']);
 
-    $stmt = $conn->prepare("INSERT INTO events (org_id, event_name, event_date, location) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("isss", $org_id, $name, $date, $location);
+    if (empty($org_id) || empty($name) || empty($date)) {
+        $error = 'Please fill in all required fields.';
+    } else {
+        $stmt = $conn->prepare("INSERT INTO events (org_id, event_name, event_date, location) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("isss", $org_id, $name, $date, $location);
 
-    if ($stmt->execute()) {
-        header('Location: index.php');
-        exit;
+        if ($stmt->execute()) {
+            $_SESSION['success'] = 'Event added successfully!';
+            header('Location: index.php');
+            exit;
+        } else {
+            $error = 'Failed to add event.';
+        }
+        $stmt->close();
     }
 }
+$conn->close();
 ?>
 
 <?php include '../includes/header.php'; ?>
-<?php include '../includes/navbar.php'; ?>
 
-<div class="container">
-    <h2>Add Event</h2>
+<div class="page-header">
+    <div>
+        <h2>Add Event</h2>
+        <p>Schedule a new organization event.</p>
+    </div>
+    <a href="index.php" class="btn btn-secondary">
+        <span class="material-symbols-outlined"></span> Back to Events
+    </a>
+</div>
 
-    <form method="POST">
-        <label>Organization:</label><br>
-        <select name="org_id" required>
-            <?php while($o = $orgs->fetch_assoc()): ?>
-                <option value="<?php echo $o['org_id']; ?>">
-                    <?php echo $o['org_name']; ?>
-                </option>
-            <?php endwhile; ?>
-        </select><br><br>
+<?php if ($error): ?>
+    <div class="alert error"><span class="material-symbols-outlined">error</span> <?php echo htmlspecialchars($error); ?></div>
+<?php endif; ?>
 
-        <input type="text" name="event_name" placeholder="Event Name" required><br><br>
-        <input type="date" name="event_date" required><br><br>
-        <input type="text" name="location" placeholder="Location"><br><br>
+<div class="card" style="max-width: 680px;">
+    <div class="card-header">
+        <h3>Event Details</h3>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="form-grid">
 
-        <button type="submit">Add Event</button>
-    </form>
+                <div class="form-group full-width">
+                    <label>Organization <span class="req">*</span></label>
+                    <select name="org_id" required>
+                        <option value="">— Select Organization —</option>
+                        <?php foreach ($org_list as $o): ?>
+                            <option value="<?php echo $o['org_id']; ?>"
+                                <?php echo (($_POST['org_id'] ?? '') == $o['org_id']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($o['org_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Event Name <span class="req">*</span></label>
+                    <input type="text" name="event_name"
+                           placeholder="e.g. General Assembly 2025"
+                           value="<?php echo htmlspecialchars($_POST['event_name'] ?? ''); ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Event Date <span class="req">*</span></label>
+                    <input type="date" name="event_date"
+                           value="<?php echo htmlspecialchars($_POST['event_date'] ?? ''); ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location"
+                           placeholder="e.g. University Gymnasium"
+                           value="<?php echo htmlspecialchars($_POST['location'] ?? ''); ?>">
+                </div>
+
+            </div>
+
+            <div class="form-actions" style="margin-top:24px;">
+                <button type="submit" class="btn btn-primary">
+                    <span class="material-symbols-outlined"></span> Add Event
+                </button>
+                <a href="index.php" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <?php include '../includes/footer.php'; ?>
