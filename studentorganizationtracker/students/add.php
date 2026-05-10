@@ -43,16 +43,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Add New Student</h2>
         <p>Fill in the details below to register a student.</p>
     </div>
-    <a href="index.php" class="btn btn-secondary">← Back to Students</a>
+    <a href="index.php" class="btn btn-secondary">
+        <span class="material-symbols-outlined"></span> Back to Students
+    </a>
 </div>
 
 <?php if ($error): ?>
-    <div class="alert error">⚠️ <?php echo htmlspecialchars($error); ?></div>
+    <div class="alert error"><span class="material-symbols-outlined">error</span> <?php echo htmlspecialchars($error); ?></div>
 <?php endif; ?>
 
 <div class="card" style="max-width: 720px;">
     <div class="card-header">
-        <h3>🎒 Student Information</h3>
+        <h3>Student Information</h3>
     </div>
     <div class="card-body">
         <form method="POST">
@@ -101,8 +103,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             </div>
 
-            <div class="form-actions" style="margin-top:20px;">
-                <button type="submit" class="btn btn-primary">✅ Add Student</button>
+            <div class="form-actions" style="margin-top:24px;">
+                <button type="submit" class="btn btn-primary">
+                    <span class="material-symbols-outlined"></span> Add Student
+                </button>
                 <a href="index.php" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
