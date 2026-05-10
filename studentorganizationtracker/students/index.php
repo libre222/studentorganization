@@ -34,23 +34,23 @@ $conn->close();
         <h2>Students</h2>
         <p>Manage all enrolled student records.</p>
     </div>
-    <a href="add.php" class="btn btn-primary">+ Add Student</a>
+    <a href="add.php" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Add Student
+    </a>
 </div>
 
-<!-- Alerts -->
 <?php if (isset($_SESSION['success'])): ?>
-    <div class="alert success">✅ <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
+    <div class="alert success"><span class="material-symbols-outlined">check_circle</span> <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
 <?php endif; ?>
 <?php if (isset($_SESSION['error'])): ?>
-    <div class="alert error">⚠️ <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
+    <div class="alert error"><span class="material-symbols-outlined">error</span> <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
 <?php endif; ?>
 
-<!-- Toolbar -->
 <div class="toolbar">
     <div class="toolbar-left">
         <form method="GET" style="display:flex; gap:8px; align-items:center;">
             <div class="search-field">
-                <span class="search-icon-inner">🔍</span>
+                <span class="material-symbols-outlined search-icon-inner">search</span>
                 <input type="text" name="search"
                        placeholder="Search by name, course, email..."
                        value="<?php echo htmlspecialchars($search); ?>">
@@ -61,12 +61,11 @@ $conn->close();
             <?php endif; ?>
         </form>
     </div>
-    <div style="font-size:12.5px; color:var(--text-muted);">
+    <div style="font-size:13px; color:var(--secondary);">
         <?php echo count($students); ?> record<?php echo count($students) !== 1 ? 's' : ''; ?> found
     </div>
 </div>
 
-<!-- Table Card -->
 <div class="card">
     <div class="table-wrap">
         <table class="data-table">
@@ -85,7 +84,7 @@ $conn->close();
                 <tr>
                     <td colspan="6">
                         <div class="empty-state">
-                            <div class="empty-icon">🎒</div>
+                            <div class="empty-icon"><span class="material-symbols-outlined">school</span></div>
                             <p>No students found<?php echo $search ? ' matching "' . htmlspecialchars($search) . '"' : ''; ?>.</p>
                             <a href="add.php" class="btn btn-primary btn-sm">Add First Student</a>
                         </div>
@@ -96,15 +95,19 @@ $conn->close();
                 <tr>
                     <td class="cell-id">#<?php echo htmlspecialchars($s['student_id']); ?></td>
                     <td class="cell-name"><?php echo htmlspecialchars($s['student_name'] ?? ($s['first_name'] . ' ' . $s['last_name'])); ?></td>
-                    <td><?php echo htmlspecialchars($s['course'] ?? $s['major'] ?? '—'); ?></td>
+                    <td style="color:var(--secondary);"><?php echo htmlspecialchars($s['course'] ?? $s['major'] ?? '—'); ?></td>
                     <td><span class="badge badge-blue"><?php echo htmlspecialchars($s['year_level'] ?? $s['year'] ?? '—'); ?></span></td>
-                    <td style="color:var(--text-muted); font-size:13px;"><?php echo htmlspecialchars($s['email']); ?></td>
+                    <td style="color:var(--secondary); font-size:13px;"><?php echo htmlspecialchars($s['email']); ?></td>
                     <td>
                         <div class="td-actions">
-                            <a href="edit.php?id=<?php echo $s['student_id']; ?>" class="btn btn-secondary btn-sm">✏️ Edit</a>
+                            <a href="edit.php?id=<?php echo $s['student_id']; ?>" class="btn btn-secondary btn-sm">
+                                <span class="material-symbols-outlined"></span> Edit
+                            </a>
                             <a href="delete.php?id=<?php echo $s['student_id']; ?>"
                                class="btn btn-danger btn-sm"
-                               onclick="return confirm('Delete this student? This cannot be undone.')">🗑️ Delete</a>
+                               onclick="return confirm('Delete this student? This cannot be undone.')">
+                                <span class="material-symbols-outlined"></span> Delete
+                            </a>
                         </div>
                     </td>
                 </tr>
