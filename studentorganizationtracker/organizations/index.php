@@ -30,18 +30,20 @@ $conn->close();
         <h2>Organizations</h2>
         <p>Manage all student organizations in the system.</p>
     </div>
-    <a href="add.php" class="btn btn-primary">+ Add Organization</a>
+    <a href="add.php" class="btn btn-primary">
+        <span class="material-symbols-outlined"></span> Add Organization
+    </a>
 </div>
 
 <?php if (isset($_SESSION['success'])): ?>
-    <div class="alert success">✅ <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
+    <div class="alert success"><span class="material-symbols-outlined">check_circle</span> <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
 <?php endif; ?>
 
 <div class="toolbar">
     <div class="toolbar-left">
         <form method="GET" style="display:flex; gap:8px; align-items:center;">
             <div class="search-field">
-                <span class="search-icon-inner">🔍</span>
+                <span class="material-symbols-outlined search-icon-inner">search</span>
                 <input type="text" name="search"
                        placeholder="Search organizations..."
                        value="<?php echo htmlspecialchars($search); ?>">
@@ -50,7 +52,7 @@ $conn->close();
             <?php if ($search): ?><a href="index.php" class="btn btn-secondary btn-sm">Clear</a><?php endif; ?>
         </form>
     </div>
-    <div style="font-size:12.5px; color:var(--text-muted);">
+    <div style="font-size:13px; color:var(--secondary);">
         <?php echo count($organizations); ?> organization<?php echo count($organizations) !== 1 ? 's' : ''; ?>
     </div>
 </div>
@@ -72,7 +74,7 @@ $conn->close();
                 <tr>
                     <td colspan="5">
                         <div class="empty-state">
-                            <div class="empty-icon">🏛️</div>
+                            <div class="empty-icon"><span class="material-symbols-outlined">corporate_fare</span></div>
                             <p>No organizations found.</p>
                             <a href="add.php" class="btn btn-primary btn-sm">Add First Organization</a>
                         </div>
@@ -83,19 +85,23 @@ $conn->close();
                 <tr>
                     <td class="cell-id">#<?php echo htmlspecialchars($o['org_id']); ?></td>
                     <td class="cell-name"><?php echo htmlspecialchars($o['org_name']); ?></td>
-                    <td style="color:var(--text-secondary); max-width:300px;">
+                    <td style="color:var(--secondary); max-width:300px;">
                         <?php
                         $desc = $o['description'] ?? '';
                         echo htmlspecialchars(strlen($desc) > 80 ? substr($desc, 0, 80) . '…' : $desc);
                         ?>
                     </td>
-                    <td><span class="badge badge-gray">📅 <?php echo htmlspecialchars($o['date_created']); ?></span></td>
+                    <td><span class="badge badge-gray"><?php echo htmlspecialchars($o['date_created']); ?></span></td>
                     <td>
                         <div class="td-actions">
-                            <a href="edit.php?id=<?php echo $o['org_id']; ?>" class="btn btn-secondary btn-sm">✏️ Edit</a>
+                            <a href="edit.php?id=<?php echo $o['org_id']; ?>" class="btn btn-secondary btn-sm">
+                                <span class="material-symbols-outlined"></span> Edit
+                            </a>
                             <a href="delete.php?id=<?php echo $o['org_id']; ?>"
                                class="btn btn-danger btn-sm"
-                               onclick="return confirm('Delete this organization?')">🗑️ Delete</a>
+                               onclick="return confirm('Delete this organization?')">
+                                <span class="material-symbols-outlined"></span> Delete
+                            </a>
                         </div>
                     </td>
                 </tr>
