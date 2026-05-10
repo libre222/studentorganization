@@ -43,21 +43,23 @@ $conn->close();
         <h2>Memberships</h2>
         <p>Manage student memberships in organizations.</p>
     </div>
-    <a href="add.php" class="btn btn-primary">+ Add Membership</a>
+    <a href="add.php" class="btn btn-primary">
+        <span class="material-symbols-outlined"></span> Add Membership
+    </a>
 </div>
 
 <?php if (isset($_SESSION['success'])): ?>
-    <div class="alert success">✅ <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
+    <div class="alert success"><span class="material-symbols-outlined">check_circle</span> <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
 <?php endif; ?>
 <?php if (isset($_SESSION['error'])): ?>
-    <div class="alert error">⚠️ <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
+    <div class="alert error"><span class="material-symbols-outlined">error</span> <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
 <?php endif; ?>
 
 <div class="toolbar">
     <div class="toolbar-left">
         <form method="GET" style="display:flex; gap:8px; align-items:center;">
             <div class="search-field">
-                <span class="search-icon-inner">🔍</span>
+                <span class="material-symbols-outlined search-icon-inner">search</span>
                 <input type="text" name="search"
                        placeholder="Search by student, org, role..."
                        value="<?php echo htmlspecialchars($search); ?>">
@@ -68,7 +70,7 @@ $conn->close();
             <?php endif; ?>
         </form>
     </div>
-    <div style="font-size:12.5px; color:var(--text-muted);">
+    <div style="font-size:13px; color:var(--secondary);">
         <?php echo count($memberships); ?> record<?php echo count($memberships) !== 1 ? 's' : ''; ?>
     </div>
 </div>
@@ -91,7 +93,7 @@ $conn->close();
                 <tr>
                     <td colspan="6">
                         <div class="empty-state">
-                            <div class="empty-icon">🤝</div>
+                            <div class="empty-icon"><span class="material-symbols-outlined">card_membership</span></div>
                             <p>No memberships found<?php echo $search ? ' matching "' . htmlspecialchars($search) . '"' : ''; ?>.</p>
                             <a href="add.php" class="btn btn-primary btn-sm">Add First Membership</a>
                         </div>
@@ -101,7 +103,7 @@ $conn->close();
                 <?php foreach ($memberships as $m): ?>
                 <tr>
                     <td class="cell-id">#<?php echo htmlspecialchars($m['membership_id']); ?></td>
-                    <td class="cell-name">🎒 <?php echo htmlspecialchars($m['student_name']); ?></td>
+                    <td class="cell-name"><?php echo htmlspecialchars($m['student_name']); ?></td>
                     <td><span class="badge badge-blue"><?php echo htmlspecialchars($m['org_name']); ?></span></td>
                     <td>
                         <?php
@@ -115,12 +117,14 @@ $conn->close();
                         ?>
                         <span class="badge <?php echo $badge_class; ?>"><?php echo htmlspecialchars($role); ?></span>
                     </td>
-                    <td style="color:var(--text-muted);">📅 <?php echo htmlspecialchars($m['date_joined'] ?? '—'); ?></td>
+                    <td style="color:var(--secondary);"><?php echo htmlspecialchars($m['date_joined'] ?? '—'); ?></td>
                     <td>
                         <div class="td-actions">
                             <a href="delete.php?id=<?php echo $m['membership_id']; ?>"
                                class="btn btn-danger btn-sm"
-                               onclick="return confirm('Remove this membership?')">🗑️ Remove</a>
+                               onclick="return confirm('Remove this membership?')">
+                                <span class="material-symbols-outlined"></span> Remove
+                            </a>
                         </div>
                     </td>
                 </tr>
