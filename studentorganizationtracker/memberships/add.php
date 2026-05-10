@@ -25,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($student_id) || empty($org_id)) {
         $error = 'Please select both a student and an organization.';
     } else {
-        // Check for duplicate
         $check = $conn->prepare("SELECT membership_id FROM memberships WHERE student_id = ? AND org_id = ?");
         $check->bind_param("ii", $student_id, $org_id);
         $check->execute();
@@ -58,23 +57,26 @@ $conn->close();
         <h2>Add Membership</h2>
         <p>Enroll a student into an organization.</p>
     </div>
-    <a href="index.php" class="btn btn-secondary">← Back to Memberships</a>
+    <a href="index.php" class="btn btn-secondary">
+        <span class="material-symbols-outlined">arrow_back</span> Back to Memberships
+    </a>
 </div>
 
 <?php if ($error): ?>
-    <div class="alert error">⚠️ <?php echo htmlspecialchars($error); ?></div>
+    <div class="alert error"><span class="material-symbols-outlined">error</span> <?php echo htmlspecialchars($error); ?></div>
 <?php endif; ?>
 
 <?php if (empty($student_list) || empty($org_list)): ?>
     <div class="alert warning">
-        ⚠️ You need at least one <a href="../students/add.php" style="font-weight:600;color:inherit;text-decoration:underline;">student</a>
+        <span class="material-symbols-outlined">warning</span>
+        You need at least one <a href="../students/add.php" style="font-weight:600;color:inherit;text-decoration:underline;">student</a>
         and one <a href="../organizations/add.php" style="font-weight:600;color:inherit;text-decoration:underline;">organization</a> before adding memberships.
     </div>
 <?php else: ?>
 
 <div class="card" style="max-width:680px;">
     <div class="card-header">
-        <h3>🤝 Membership Details</h3>
+        <h3>Membership Details</h3>
     </div>
     <div class="card-body">
         <form method="POST">
@@ -109,10 +111,7 @@ $conn->close();
                 <div class="form-group">
                     <label>Role / Position</label>
                     <select name="role">
-                        <?php
-                        $roles = ['Member', 'Officer', 'Secretary', 'Treasurer', 'President'];
-                        foreach ($roles as $r):
-                        ?>
+                        <?php foreach (['Member', 'Officer', 'Secretary', 'Treasurer', 'President'] as $r): ?>
                             <option value="<?php echo $r; ?>"
                                 <?php echo (($_POST['role'] ?? 'Member') === $r) ? 'selected' : ''; ?>>
                                 <?php echo $r; ?>
@@ -129,8 +128,10 @@ $conn->close();
 
             </div>
 
-            <div class="form-actions" style="margin-top:20px;">
-                <button type="submit" class="btn btn-primary">✅ Add Membership</button>
+            <div class="form-actions" style="margin-top:24px;">
+                <button type="submit" class="btn btn-primary">
+                    <span class="material-symbols-outlined">save</span> Add Membership
+                </button>
                 <a href="index.php" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
