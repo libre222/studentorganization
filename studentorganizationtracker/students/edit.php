@@ -30,28 +30,27 @@ if (!$student) {
     exit;
 }
 
+$error = '';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-    $name = trim($_POST['student_name']);
+    $name   = trim($_POST['student_name']);
     $course = trim($_POST['course']);
-    $year = $_POST['year_level'];
-    $email = trim($_POST['email']);
+    $year   = $_POST['year_level'];
+    $email  = trim($_POST['email']);
 
-    if (empty($name) || empty($course) || empty($year) || empty($email)) {
-        $error = "All fields are required.";
+    if (empty($name) || empty($email)) {
+        $error = 'Name and email are required.';
     } else {
-
         $stmt = $conn->prepare("UPDATE students SET student_name=?, course=?, year_level=?, email=? WHERE student_id=?");
-        $stmt->bind_param("ssisi", $name, $course, $year, $email, $id);
+        $stmt->bind_param("ssssi", $name, $course, $year, $email, $id);
 
         if ($stmt->execute()) {
-            $_SESSION['success'] = "Student updated successfully!";
+            $_SESSION['success'] = 'Student updated successfully!';
             header('Location: index.php');
             exit;
         } else {
-            $error = "Update failed.";
+            $error = 'Update failed.';
         }
-
         $stmt->close();
     }
 }
@@ -60,24 +59,70 @@ $conn->close();
 ?>
 
 <?php include '../includes/header.php'; ?>
-<?php include '../includes/navbar.php'; ?>
 
-<div class="container">
-    <h2>Edit Student</h2>
+<div class="page-header">
+    <div>
+        <h2>Edit Student</h2>
+        <p>Update the student's information below.</p>
+    </div>
+    <a href="index.php" class="btn btn-secondary">
+        <span class="material-symbols-outlined"></span> Back to Students
+    </a>
+</div>
 
-    <?php if (!empty($error)): ?>
-        <div class="alert error"><?php echo $error; ?></div>
-    <?php endif; ?>
+<?php if ($error): ?>
+    <div class="alert error"><span class="material-symbols-outlined">error</span> <?php echo htmlspecialchars($error); ?></div>
+<?php endif; ?>
 
-    <form method="POST">
-        <input type="text" name="student_name" value="<?php echo $student['student_name']; ?>" required>
-        <input type="text" name="course" value="<?php echo $student['course']; ?>" required>
-        <input type="number" name="year_level" value="<?php echo $student['year_level']; ?>" required>
-        <input type="email" name="email" value="<?php echo $student['email']; ?>" required>
+<div class="card" style="max-width: 720px;">
+    <div class="card-header">
+        <h3>Student Information</h3>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="form-grid">
 
-        <button type="submit">Update</button>
-        <a href="index.php">Cancel</a>
-    </form>
+                <div class="form-group full-width">
+                    <label>Full Name <span class="req">*</span></label>
+                    <input type="text" name="student_name"
+                           value="<?php echo htmlspecialchars($student['student_name']); ?>" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Email Address <span class="req">*</span></label>
+                    <input type="email" name="email"
+                           value="<?php echo htmlspecialchars($student['email']); ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Course</label>
+                    <input type="text" name="course"
+                           value="<?php echo htmlspecialchars($student['course'] ?? ''); ?>">
+                </div>
+
+                <div class="form-group">
+                    <label>Year Level</label>
+                    <select name="year_level">
+                        <option value="">— Select Year —</option>
+                        <?php foreach (['1st Year','2nd Year','3rd Year','4th Year'] as $yr): ?>
+                            <option value="<?php echo $yr; ?>"
+                                <?php echo (($student['year_level'] ?? '') === $yr) ? 'selected' : ''; ?>>
+                                <?php echo $yr; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-actions" style="margin-top:24px;">
+                <button type="submit" class="btn btn-primary">
+                    <span class="material-symbols-outlined"></span> Save Changes
+                </button>
+                <a href="index.php" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <?php include '../includes/footer.php'; ?>
